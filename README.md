@@ -8,7 +8,7 @@ Close the rabbit holes, bonk the bunnies, grab the power-ups, and survive as man
 waves as you can. Built with plain HTML, CSS, vanilla JavaScript and Three.js —
 no framework, no build step, no backend.
 
-[![Play now](https://img.shields.io/badge/%E2%96%B6%20PLAY%20NOW-play%20the%20game-ff8a3d?style=for-the-badge)](#-play-now)
+[![Play now](https://img.shields.io/badge/%E2%96%B6%20PLAY%20NOW-play%20the%20game-ff8a3d?style=for-the-badge)](https://carrotguardian.vercel.app/)
 [![Three.js](https://img.shields.io/badge/Three.js-r160-049ef4?style=flat-square&logo=three.js&logoColor=white)](https://threejs.org)
 [![Vanilla JS](https://img.shields.io/badge/Vanilla-JavaScript-f7df1e?style=flat-square&logo=javascript&logoColor=black)](https://developer.mozilla.org/docs/Web/JavaScript)
 [![No build step](https://img.shields.io/badge/build%20step-none-6cc24a?style=flat-square)](#-getting-started)
