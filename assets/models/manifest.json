@@ -1,0 +1,23 @@
+{
+  "//": "Optional external model overrides (AGENTS.md 9). Leave every value null to use the bundled procedural low-poly models. A path points at a GLB whose pivots are normalised on load, so it plugs in without touching game code.",
+  "models": {
+    "player": null,
+    "rabbit": null,
+    "carrot": null,
+    "hole": null,
+    "holeSimple": null,
+    "powerupSpeed": null,
+    "powerupStrength": null,
+    "powerupRange": null,
+    "tree": null,
+    "bush": null,
+    "flower": null,
+    "rock": null,
+    "mushroom": null,
+    "log": null,
+    "wateringCan": null,
+    "sign": null,
+    "fencePost": null,
+    "fenceRail": null
+  }
+}

@@ -1,0 +1,319 @@
+/* =========================================================
+   main.css - reset, tokens, layout, shared UI primitives
+   ========================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: #1f3a26;
+  color: var(--ink);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+  /* Cozy palette */
+  --cream: #fdf6e6;
+  --cream-dim: #f3e7cd;
+  --ink: #3d2c1e;
+  --ink-soft: #7b6350;
+  --carrot: #f4883b;
+  --carrot-deep: #e0671d;
+  --leaf: #6cc04a;
+  --leaf-deep: #3f8f34;
+  --sky: #8fd3f4;
+  --sun: #ffd469;
+  --danger: #e5544b;
+  --panel: rgba(253, 246, 230, 0.94);
+  --panel-shadow: 0 10px 28px rgba(38, 25, 14, 0.28);
+
+  --radius-lg: 26px;
+  --radius-md: 18px;
+  --radius-sm: 12px;
+
+  --font-ui: "Nunito", "Quicksand", "Baloo 2", "Segoe UI Rounded",
+    "SF Pro Rounded", "Hiragino Maru Gothic ProN", system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+}
+
+#app {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  isolation: isolate;
+}
+
+#game-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: default;
+}
+
+#game-canvas.is-playing {
+  cursor: crosshair;
+}
+
+/* ---------------------------------------------- */
+/* Screens (loading / menu / overlays)             */
+/* ---------------------------------------------- */
+
+.screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: calc(20px + var(--safe-t)) calc(20px + var(--safe-r))
+    calc(20px + var(--safe-b)) calc(20px + var(--safe-l));
+  z-index: 20;
+}
+
+.screen.is-active {
+  display: flex;
+  animation: screen-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.screen--overlay {
+  background: rgba(46, 30, 18, 0.52);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 40;
+}
+
+.screen--loading {
+  background:
+    radial-gradient(120% 90% at 50% 8%, #ffe9b0 0%, rgba(255, 233, 176, 0) 60%),
+    linear-gradient(180deg, #a8e0f2 0%, #c9ecc9 46%, #8ed177 100%);
+}
+
+/* Translucent on purpose: the garden keeps rendering behind the menu, so the
+   board, the carrot and the holes introduce the game before PLAY is pressed. */
+.screen--menu {
+  background:
+    radial-gradient(120% 90% at 50% 6%, rgba(255, 238, 194, 0.5) 0%, rgba(255, 233, 176, 0) 62%),
+    linear-gradient(
+      180deg,
+      rgba(168, 224, 242, 0.44) 0%,
+      rgba(201, 236, 201, 0.3) 44%,
+      rgba(142, 209, 119, 0.42) 100%
+    );
+  backdrop-filter: blur(2px) saturate(1.06);
+  -webkit-backdrop-filter: blur(2px) saturate(1.06);
+}
+
+@keyframes screen-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------------------------------------------- */
+/* Buttons                                          */
+/* ---------------------------------------------- */
+
+.btn {
+  --btn-bg: var(--panel);
+  --btn-fg: var(--ink);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  min-height: 52px;
+  min-width: 168px;
+  padding: 0.85em 1.6em;
+  border: 0;
+  border-radius: 999px;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  touch-action: manipulation;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.16), 0 12px 22px rgba(38, 25, 14, 0.22);
+  transform: translateY(0);
+  transition: transform 120ms ease, box-shadow 120ms ease, filter 160ms ease;
+}
+
+.btn:hover {
+  filter: brightness(1.04);
+}
+
+.btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.16), 0 6px 12px rgba(38, 25, 14, 0.2);
+}
+
+.btn:focus-visible {
+  outline: 3px solid var(--sun);
+  outline-offset: 3px;
+}
+
+.btn--primary {
+  --btn-bg: linear-gradient(180deg, #ffb457 0%, var(--carrot) 58%, var(--carrot-deep) 100%);
+  --btn-fg: #fffdf6;
+  text-shadow: 0 2px 0 rgba(120, 55, 10, 0.35);
+}
+
+.btn--ghost {
+  --btn-bg: rgba(253, 246, 230, 0.92);
+  --btn-fg: var(--ink);
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.12), 0 10px 20px rgba(38, 25, 14, 0.16);
+}
+
+.btn--xl {
+  min-height: 64px;
+  min-width: 232px;
+  font-size: 1.3rem;
+  letter-spacing: 0.1em;
+}
+
+.btn--block {
+  width: 100%;
+}
+
+.btn__icon {
+  font-size: 0.9em;
+  opacity: 0.9;
+}
+
+/* ---------------------------------------------- */
+/* Switches / selects (options)                    */
+/* ---------------------------------------------- */
+
+.option-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0.2rem;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.option-row--select {
+  cursor: default;
+}
+
+.switch {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  width: 58px;
+  height: 32px;
+  margin: 0;
+  border-radius: 999px;
+  background: #cbbba4;
+  cursor: pointer;
+  transition: background 180ms ease;
+  flex: 0 0 auto;
+}
+
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #fffdf6;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.28);
+  transition: transform 180ms cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+
+.switch:checked {
+  background: var(--leaf);
+}
+
+.switch:checked::after {
+  transform: translateX(26px);
+}
+
+.switch:focus-visible {
+  outline: 3px solid var(--sun);
+  outline-offset: 3px;
+}
+
+.select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 0.5em 2.2em 0.5em 0.9em;
+  border: 2px solid #e0cdae;
+  border-radius: var(--radius-sm);
+  background: #fffdf6
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='%233d2c1e' d='M1 1l5 5 5-5'/%3E%3C/svg%3E")
+    no-repeat right 0.75em center / 11px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+/* ---------------------------------------------- */
+/* Debug panel                                      */
+/* ---------------------------------------------- */
+
+.debug {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  z-index: 60;
+  margin: 0;
+  padding: 8px 10px;
+  max-width: 46vw;
+  border-radius: var(--radius-sm);
+  background: rgba(20, 14, 9, 0.78);
+  color: #c9f7b0;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------- */
+/* Reduced motion                                   */
+/* ---------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .screen.is-active {
+    animation: none;
+  }
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.06s !important;
+  }
+}

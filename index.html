@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#2f7a3f" />
+<meta name="description" content="Carrot Guardian - a cozy isometric carrot defense game." />
+<title>Carrot Guardian</title>
+<link rel="stylesheet" href="css/main.css" />
+<link rel="stylesheet" href="css/menu.css" />
+<link rel="stylesheet" href="css/game.css" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>&#129369;</text></svg>" />
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/build/three.module.js",
+    "three/addons/": "./vendor/three/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+
+<div id="app">
+  <canvas id="game-canvas" aria-label="Carrot Guardian game board"></canvas>
+
+  <!-- ===================== LOADING ===================== -->
+  <section id="loading-screen" class="screen screen--loading is-active" aria-live="polite">
+    <div class="loading-card">
+      <div class="loading-logo" aria-hidden="true">
+        <span class="loading-logo__carrot">&#129369;</span>
+      </div>
+      <h1 class="loading-title">Carrot Guardian</h1>
+      <div class="loading-bar" role="progressbar" aria-label="Loading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div class="loading-bar__fill" id="loading-fill"></div>
+      </div>
+      <p class="loading-status" id="loading-status">Loading garden&hellip;</p>
+    </div>
+  </section>
+
+  <!-- ===================== MAIN MENU ===================== -->
+  <section id="main-menu" class="screen screen--menu" aria-label="Main menu">
+    <div class="menu-card">
+      <div class="menu-hero" aria-hidden="true">
+        <span class="menu-hero__carrot">&#129369;</span>
+        <span class="menu-hero__spark menu-hero__spark--a"></span>
+        <span class="menu-hero__spark menu-hero__spark--b"></span>
+        <span class="menu-hero__spark menu-hero__spark--c"></span>
+      </div>
+
+      <h1 class="menu-title">Carrot<span class="menu-title__accent">Guardian</span></h1>
+      <p class="menu-tagline">Keep the carrots safe. The rabbits are coming.</p>
+
+      <div class="menu-actions">
+        <button type="button" class="btn btn--primary btn--xl" id="btn-play" data-menu-action="play">
+          <span class="btn__icon" aria-hidden="true">&#9654;</span> PLAY
+        </button>
+        <button type="button" class="btn btn--ghost" id="btn-options" data-menu-action="options">
+          <span class="btn__icon" aria-hidden="true">&#9881;</span> OPTIONS
+        </button>
+      </div>
+
+      <p class="menu-hint" id="menu-best">Best wave: &mdash;</p>
+    </div>
+
+    <!-- Options panel -->
+    <div class="options-panel" id="options-panel" hidden>
+      <div class="options-card" role="dialog" aria-modal="true" aria-labelledby="options-title">
+        <h2 class="options-title" id="options-title">Options</h2>
+
+        <label class="option-row">
+          <span class="option-row__label">Music</span>
+          <input type="checkbox" class="switch" id="opt-music" checked />
+        </label>
+        <label class="option-row">
+          <span class="option-row__label">Sound effects</span>
+          <input type="checkbox" class="switch" id="opt-sfx" checked />
+        </label>
+        <label class="option-row">
+          <span class="option-row__label">Touch controls</span>
+          <input type="checkbox" class="switch" id="opt-touch" />
+        </label>
+        <label class="option-row">
+          <span class="option-row__label">Shadows</span>
+          <input type="checkbox" class="switch" id="opt-shadows" checked />
+        </label>
+        <label class="option-row option-row--select">
+          <span class="option-row__label">Quality</span>
+          <select class="select" id="opt-quality">
+            <option value="auto">Auto</option>
+            <option value="high">High</option>
+            <option value="low">Low</option>
+          </select>
+        </label>
+
+        <button type="button" class="btn btn--ghost btn--block" id="btn-options-close">BACK</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== HUD ===================== -->
+  <section id="hud" class="hud" aria-label="Game status">
+    <div class="hud__top">
+      <div class="hud__panel hud__carrot" id="hud-carrot-panel">
+        <span class="hud__carrot-icon" aria-hidden="true">&#129369;</span>
+        <div class="hud__carrot-body">
+          <div class="hud__carrot-label">
+            <span>CARROT</span>
+            <span class="hud__carrot-value" id="hud-carrot-value">100%</span>
+          </div>
+          <div class="hud__bar hud__bar--carrot" id="hud-carrot-bar">
+            <div class="hud__bar-fill" id="hud-carrot-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hud__panel hud__wave">
+        <span class="hud__wave-label">WAVE</span>
+        <span class="hud__wave-value" id="hud-wave-value">1</span>
+      </div>
+
+      <div class="hud__panel hud__score">
+        <span class="hud__score-label">SCORE</span>
+        <span class="hud__score-value" id="hud-score-value">0</span>
+      </div>
+    </div>
+
+    <!-- Active power-up chips -->
+    <div class="hud__buffs" id="hud-buffs" aria-live="polite"></div>
+
+    <!-- Wave banner -->
+    <div class="wave-banner" id="wave-banner" aria-live="assertive">
+      <span class="wave-banner__text" id="wave-banner-text">WAVE 1</span>
+    </div>
+
+    <!-- Contextual hint -->
+    <div class="hint-toast" id="hint-toast"></div>
+
+    <!-- Pause button (touch friendly) -->
+    <button type="button" class="icon-btn hud__pause" id="btn-pause" aria-label="Pause game">&#10073;&#10073;</button>
+  </section>
+
+  <!-- ===================== TOUCH CONTROLS ===================== -->
+  <div id="touch-controls" class="touch" hidden>
+    <div class="touch__joystick" id="touch-joystick">
+      <div class="touch__joystick-base"></div>
+      <div class="touch__joystick-stick" id="touch-joystick-stick"></div>
+    </div>
+    <div class="touch__buttons">
+      <button type="button" class="touch-btn touch-btn--interact" id="btn-interact" aria-label="Close hole">
+        <span class="touch-btn__glyph" aria-hidden="true">&#9744;</span>
+        <span class="touch-btn__caption">CLOSE</span>
+      </button>
+      <button type="button" class="touch-btn touch-btn--attack" id="btn-attack" aria-label="Attack">
+        <span class="touch-btn__glyph" aria-hidden="true">&#9876;</span>
+        <span class="touch-btn__caption">HIT!</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===================== PAUSE ===================== -->
+  <section id="pause-screen" class="screen screen--overlay" aria-label="Paused">
+    <div class="pause-card">
+      <h2 class="pause-title">Paused</h2>
+      <div class="menu-actions">
+        <button type="button" class="btn btn--primary" id="btn-resume">RESUME</button>
+        <button type="button" class="btn btn--ghost" id="btn-restart-pause">RESTART</button>
+        <button type="button" class="btn btn--ghost" id="btn-menu-pause">MAIN MENU</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== GAME OVER ===================== -->
+  <section id="game-over" class="screen screen--overlay" aria-label="Game over">
+    <div class="over-card">
+      <div class="over-card__emoji" aria-hidden="true">&#129369;</div>
+      <h2 class="over-title">Oh no!</h2>
+      <p class="over-sub">The rabbits ate the carrot!</p>
+
+      <dl class="over-stats">
+        <div class="over-stat">
+          <dt>Wave reached</dt>
+          <dd id="over-wave">1</dd>
+        </div>
+        <div class="over-stat">
+          <dt>Rabbits stopped</dt>
+          <dd id="over-kills">0</dd>
+        </div>
+        <div class="over-stat">
+          <dt>Holes closed</dt>
+          <dd id="over-holes">0</dd>
+        </div>
+        <div class="over-stat over-stat--wide">
+          <dt>Score</dt>
+          <dd id="over-score">0</dd>
+        </div>
+      </dl>
+
+      <p class="over-best" id="over-best"></p>
+
+      <div class="menu-actions">
+        <button type="button" class="btn btn--primary btn--xl" id="btn-retry">TRY AGAIN</button>
+        <button type="button" class="btn btn--ghost" id="btn-menu-over">MAIN MENU</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== DEBUG ===================== -->
+  <pre id="debug-panel" class="debug" hidden></pre>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

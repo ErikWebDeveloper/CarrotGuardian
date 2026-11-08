@@ -1,0 +1,620 @@
+/* =========================================================
+   game.css - HUD, buff chips, touch controls, toasts
+   ========================================================= */
+
+/* ---------------------------------------------- */
+/* HUD shell                                        */
+/* ---------------------------------------------- */
+
+.hud {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: none;
+  pointer-events: none;
+  padding: calc(12px + var(--safe-t)) calc(12px + var(--safe-r))
+    calc(12px + var(--safe-b)) calc(12px + var(--safe-l));
+}
+
+.hud.is-active {
+  display: block;
+}
+
+.hud__top {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.hud__panel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  box-shadow: 0 6px 16px rgba(38, 25, 14, 0.22);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.hud__carrot {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 320px;
+}
+
+.hud__carrot-icon {
+  font-size: 26px;
+  filter: drop-shadow(0 2px 2px rgba(120, 70, 20, 0.3));
+}
+
+.hud__carrot-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.hud__carrot-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 5px;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: var(--ink-soft);
+}
+
+.hud__carrot-value {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.hud__bar {
+  position: relative;
+  height: 12px;
+  border-radius: 999px;
+  background: #e6d8be;
+  box-shadow: inset 0 2px 4px rgba(90, 60, 30, 0.26);
+  overflow: hidden;
+}
+
+.hud__bar-fill {
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #7ed957, #4caf3d);
+  transform-origin: left center;
+  transition: width 260ms cubic-bezier(0.22, 1, 0.36, 1), background 320ms ease;
+}
+
+/* Carrot health states */
+.hud__carrot-panel.is-warning .hud__bar-fill {
+  background: linear-gradient(90deg, #ffc44d, #f19b20);
+}
+
+.hud__carrot-panel.is-critical .hud__bar-fill {
+  background: linear-gradient(90deg, #ff7a5c, #e03e2f);
+}
+
+.hud__carrot-panel.is-critical {
+  animation: pulse-critical 900ms ease-in-out infinite;
+}
+
+.hud__carrot-panel.is-hit {
+  animation: shake 320ms ease;
+}
+
+@keyframes pulse-critical {
+  0%,
+  100% {
+    box-shadow: 0 6px 16px rgba(38, 25, 14, 0.22);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(224, 62, 47, 0.32), 0 6px 18px rgba(38, 25, 14, 0.26);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-5px);
+  }
+  40% {
+    transform: translateX(5px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(3px);
+  }
+}
+
+.hud__wave,
+.hud__score {
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 74px;
+  padding: 8px 12px;
+}
+
+.hud__wave-label,
+.hud__score-label {
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: var(--ink-soft);
+}
+
+.hud__wave-value,
+.hud__score-value {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.hud__wave-value.is-bump {
+  animation: bump 420ms cubic-bezier(0.3, 1.5, 0.5, 1);
+}
+
+@keyframes bump {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.45);
+    color: var(--carrot-deep);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ---------------------------------------------- */
+/* Buff chips (active power-ups)                    */
+/* ---------------------------------------------- */
+
+.hud__buffs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.buff-chip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px 6px 9px;
+  border-radius: 999px;
+  background: var(--panel);
+  box-shadow: 0 5px 14px rgba(38, 25, 14, 0.2);
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  animation: chip-in 300ms cubic-bezier(0.3, 1.4, 0.5, 1) both;
+}
+
+.buff-chip.is-leaving {
+  animation: chip-out 260ms ease both;
+}
+
+.buff-chip__icon {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 14px;
+  background: var(--buff-color, var(--sun));
+  box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.12);
+}
+
+.buff-chip__time {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+  min-width: 22px;
+  text-align: right;
+}
+
+.buff-chip.is-low .buff-chip__time {
+  color: var(--danger);
+}
+
+@keyframes chip-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes chip-out {
+  to {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+}
+
+/* ---------------------------------------------- */
+/* Wave banner                                      */
+/* ---------------------------------------------- */
+
+.wave-banner {
+  position: absolute;
+  top: 26%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.7);
+  padding: 12px 34px;
+  border-radius: 999px;
+  background: var(--panel);
+  box-shadow: 0 10px 26px rgba(38, 25, 14, 0.28);
+  font-size: clamp(1.4rem, 5vw, 2.2rem);
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  color: var(--carrot-deep);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.wave-banner.is-show {
+  animation: wave-pop 1900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes wave-pop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+  }
+  18% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.06);
+  }
+  28% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  78% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -60%) scale(0.94);
+  }
+}
+
+/* ---------------------------------------------- */
+/* Contextual hint                                  */
+/* ---------------------------------------------- */
+
+.hint-toast {
+  position: absolute;
+  left: 50%;
+  /* Sits under the HUD, above the board. The board's near corner reaches the
+     bottom of the screen, so a bottom-anchored toast would cover the field. */
+  top: 78px;
+  max-width: min(520px, 88vw);
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  background: rgba(253, 246, 230, 0.95);
+  box-shadow: 0 8px 20px rgba(38, 25, 14, 0.24);
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-align: center;
+  color: var(--ink);
+  opacity: 0;
+  transform: translate(-50%, -12px);
+  transition: opacity 260ms ease, transform 260ms ease;
+  pointer-events: none;
+}
+
+.hint-toast.is-show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.hint-toast__key {
+  display: inline-block;
+  margin: 0 2px;
+  padding: 1px 8px;
+  border-radius: 7px;
+  background: var(--ink);
+  color: var(--cream);
+  font-size: 0.85em;
+  font-weight: 900;
+}
+
+/* ---------------------------------------------- */
+/* Pause button                                     */
+/* ---------------------------------------------- */
+
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--panel);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+  box-shadow: 0 5px 14px rgba(38, 25, 14, 0.24);
+  transition: transform 120ms ease;
+}
+
+.icon-btn:active {
+  transform: scale(0.92);
+}
+
+.icon-btn:focus-visible {
+  outline: 3px solid var(--sun);
+  outline-offset: 3px;
+}
+
+.hud__pause {
+  position: absolute;
+  right: calc(12px + var(--safe-r));
+  bottom: calc(12px + var(--safe-b));
+}
+
+/* ---------------------------------------------- */
+/* Touch controls                                   */
+/* ---------------------------------------------- */
+
+.touch {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  display: none;
+  pointer-events: none;
+}
+
+.touch.is-active {
+  display: block;
+}
+
+.touch[hidden] {
+  display: none;
+}
+
+/* --- Joystick --- */
+
+.touch__joystick {
+  position: absolute;
+  left: calc(22px + var(--safe-l));
+  bottom: calc(22px + var(--safe-b));
+  width: 148px;
+  height: 148px;
+  /* Purely a visual anchor: the stick is dynamic, so touches anywhere on the
+     left half of the screen must reach the canvas underneath. */
+  pointer-events: none;
+  touch-action: none;
+}
+
+.touch__joystick-base,
+.touch__joystick-stick {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.touch__joystick-base {
+  inset: 0;
+  background: radial-gradient(circle at 50% 42%, rgba(253, 246, 230, 0.5), rgba(253, 246, 230, 0.22));
+  border: 3px solid rgba(253, 246, 230, 0.66);
+  box-shadow: 0 6px 18px rgba(20, 40, 20, 0.28);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  transition: opacity 180ms ease;
+}
+
+.touch__joystick-stick {
+  top: 50%;
+  left: 50%;
+  width: 66px;
+  height: 66px;
+  margin: -33px 0 0 -33px;
+  background: radial-gradient(circle at 42% 34%, #fffaf0, #ffd79a 60%, #f0a94f);
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 6px 14px rgba(20, 40, 20, 0.34);
+  transition: transform 90ms linear;
+}
+
+.touch__joystick.is-active .touch__joystick-base {
+  border-color: rgba(255, 255, 255, 0.9);
+}
+
+/* --- Action buttons --- */
+
+.touch__buttons {
+  position: absolute;
+  right: calc(24px + var(--safe-r));
+  bottom: calc(24px + var(--safe-b));
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  pointer-events: none;
+}
+
+.touch-btn {
+  display: grid;
+  place-items: center;
+  gap: 1px;
+  width: 84px;
+  height: 84px;
+  padding: 0;
+  border: 4px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  font-family: inherit;
+  color: #fffdf6;
+  text-shadow: 0 2px 3px rgba(90, 40, 10, 0.4);
+  cursor: pointer;
+  /* The overlay is click-through, so the buttons must opt back in. */
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  pointer-events: auto;
+  touch-action: none;
+  box-shadow: 0 8px 18px rgba(20, 40, 20, 0.32);
+  transition: transform 90ms ease, filter 120ms ease;
+}
+
+.touch-btn--attack {
+  width: 96px;
+  height: 96px;
+  background: radial-gradient(circle at 42% 32%, #ffb45f, #ef7b2c 58%, #d8561a);
+}
+
+.touch-btn--interact {
+  width: 76px;
+  height: 76px;
+  background: radial-gradient(circle at 42% 32%, #a5e077, #63b342 58%, #3f8a2c);
+}
+
+.touch-btn:active,
+.touch-btn.is-down {
+  transform: scale(0.9);
+  filter: brightness(1.12);
+}
+
+.touch-btn:focus-visible {
+  outline: 4px solid var(--sun);
+  outline-offset: 4px;
+}
+
+.touch-btn__glyph {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.touch-btn--interact .touch-btn__glyph {
+  font-size: 26px;
+}
+
+.touch-btn__caption {
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+/* Action buttons dim when there is nothing in range, so the player always
+   knows whether attacking or closing a hole will do anything. */
+.touch-btn--attack,
+.touch-btn--interact {
+  opacity: 0.45;
+  transform: scale(0.92);
+  transition: transform 90ms ease, filter 120ms ease, opacity 160ms ease;
+}
+
+.touch-btn--attack.is-ready,
+.touch-btn--interact.is-ready {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ---------------------------------------------- */
+/* Small screens                                    */
+/* ---------------------------------------------- */
+
+@media (max-width: 520px) {
+  .hud {
+    padding: calc(8px + var(--safe-t)) calc(8px + var(--safe-r))
+      calc(8px + var(--safe-b)) calc(8px + var(--safe-l));
+  }
+  .hud__panel {
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+  }
+  .hud__carrot {
+    max-width: none;
+  }
+  .hud__carrot-icon {
+    font-size: 20px;
+  }
+  .hud__wave,
+  .hud__score {
+    min-width: 58px;
+    padding: 6px 8px;
+  }
+  .hud__wave-value,
+  .hud__score-value {
+    font-size: 1.05rem;
+  }
+  .hud__bar {
+    height: 10px;
+  }
+  .buff-chip {
+    font-size: 0.66rem;
+    padding: 5px 10px 5px 7px;
+  }
+  .buff-chip__icon {
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+  }
+  .touch__joystick {
+    width: 128px;
+    height: 128px;
+  }
+  .touch__joystick-stick {
+    width: 58px;
+    height: 58px;
+    margin: -29px 0 0 -29px;
+  }
+  .touch__buttons {
+    gap: 10px;
+  }
+  .touch-btn--attack {
+    width: 82px;
+    height: 82px;
+  }
+  .touch-btn--interact {
+    width: 66px;
+    height: 66px;
+  }
+  .hud__pause {
+    right: calc(8px + var(--safe-r));
+    top: calc(52px + var(--safe-t));
+    bottom: auto;
+  }
+  .hint-toast {
+    top: 72px;
+    font-size: 0.86rem;
+  }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  .hud__top {
+    gap: 6px;
+  }
+  .wave-banner {
+    /* Landscape phones are short: keep the banner clear of the hint toast
+       at the top and of the thumb controls at the bottom. */
+    top: 52%;
+  }
+  .hint-toast {
+    top: 68px;
+    font-size: 0.8rem;
+    max-width: min(420px, 62vw);
+  }
+}
