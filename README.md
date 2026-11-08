@@ -24,7 +24,7 @@ no framework, no build step, no backend.
 
 ## ▶ Play now
 
-**👉 [Play Carrot Guardian in your browser](https://your-game-url.example) 👈**
+**👉 [Play Carrot Guardian in your browser]([https://your-game-url.example](https://carrotguardian.vercel.app/)) 👈**
 
 Runs on desktop and mobile. Landscape is the preferred orientation on phones.
 No download, no account, nothing to install.
